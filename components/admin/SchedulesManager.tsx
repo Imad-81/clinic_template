@@ -12,19 +12,15 @@ import {
 } from "@/app/actions/admin";
 import { clinicConfig } from "@/config/clinic.config";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Clock,
-  Calendar,
   PlusCircle,
   Trash2,
   AlertTriangle,
-  UserCheck,
-  CheckCircle2,
 } from "lucide-react";
 
 export interface ScheduleItem {

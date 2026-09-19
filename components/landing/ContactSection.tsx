@@ -1,6 +1,6 @@
 import { clinicConfig } from "@/config/clinic.config";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Mail, Clock, MessageSquare, ExternalLink, AlertTriangle } from "lucide-react";
+import { MapPin, Phone, Clock, MessageSquare, ExternalLink, AlertTriangle } from "lucide-react";
 
 export function ContactSection() {
   const primaryPhone = clinicConfig.contact.phones[0] || "+91 40 2360 7777";

@@ -22,7 +22,7 @@ const bookingSchema = z.object({
   }),
   visitType: z.enum(["FIRST_VISIT", "FOLLOW_UP"]),
   reasonForVisit: z.string().max(200, "Reason must not exceed 200 characters").optional(),
-  consentGiven: z.literal(true, {
+  consentGiven: z.boolean().refine((val) => val === true, {
     message: "Consent under DPDP Act is required to proceed",
   }),
 });
@@ -257,13 +257,15 @@ export async function createBookingAction(
       success: true,
       reference: createdAppointment.app.reference,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Gracefully handle double booking conflicts (P2002 or Postgres 23505)
+    const message = err instanceof Error ? err.message : "";
+    const code = typeof err === "object" && err !== null && "code" in err ? (err as { code: unknown }).code : undefined;
     if (
-      err?.message === "SLOT_TAKEN" ||
-      err?.code === "P2002" ||
-      err?.message?.includes("23505") ||
-      err?.message?.includes("appointments_doctor_slot_active_uniq")
+      message === "SLOT_TAKEN" ||
+      code === "P2002" ||
+      message.includes("23505") ||
+      message.includes("appointments_doctor_slot_active_uniq")
     ) {
       return {
         success: false,

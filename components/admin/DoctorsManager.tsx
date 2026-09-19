@@ -11,13 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
-  Stethoscope,
   PlusCircle,
   Edit2,
   CheckCircle,
   XCircle,
   Upload,
-  Loader2,
   Languages,
 } from "lucide-react";
 
@@ -146,12 +144,13 @@ export function DoctorsManager({ initialDoctors }: DoctorsManagerProps) {
     setSaving(false);
 
     if (res.success && res.doctor) {
+      const savedDoc = res.doctor as unknown as DoctorAdminRecord;
       if (editingDoctor) {
         setDoctors((prev) =>
-          prev.map((d) => (d.id === res.doctor!.id ? (res.doctor as any) : d))
+          prev.map((d) => (d.id === savedDoc.id ? savedDoc : d))
         );
       } else {
-        setDoctors((prev) => [...prev, res.doctor as any]);
+        setDoctors((prev) => [...prev, savedDoc]);
       }
       setModalOpen(false);
     } else {

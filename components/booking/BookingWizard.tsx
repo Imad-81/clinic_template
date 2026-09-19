@@ -14,10 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import {
-  Calendar as CalendarIcon,
   Clock,
-  User,
-  ShieldCheck,
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
@@ -89,8 +86,10 @@ export function BookingWizard({ doctors, preselectedDoctorSlug }: BookingWizardP
     if (!selectedDoctor || !selectedDateStr) return;
 
     let isMounted = true;
-    setLoadingSlots(true);
-    setSelectedSlot(null);
+    const timer = setTimeout(() => {
+      setLoadingSlots(true);
+      setSelectedSlot(null);
+    }, 0);
 
     getDoctorSlotsAction(selectedDoctor.id, selectedDateStr)
       .then((res) => {
@@ -108,6 +107,7 @@ export function BookingWizard({ doctors, preselectedDoctorSlug }: BookingWizardP
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, [selectedDoctor, selectedDateStr]);
 
@@ -128,7 +128,7 @@ export function BookingWizard({ doctors, preselectedDoctorSlug }: BookingWizardP
       gender,
       visitType,
       reasonForVisit: reasonForVisit || undefined,
-      consentGiven: consentGiven as any,
+      consentGiven: Boolean(consentGiven),
     });
 
     if (res.success && res.reference) {
@@ -529,7 +529,7 @@ export function BookingWizard({ doctors, preselectedDoctorSlug }: BookingWizardP
                 <Select
                   id="gender"
                   value={gender}
-                  onChange={(e) => setGender(e.target.value as any)}
+                  onChange={(e) => setGender(e.target.value as "MALE" | "FEMALE" | "OTHER")}
                   className="mt-1.5"
                 >
                   <option value="MALE">Male</option>
@@ -545,7 +545,7 @@ export function BookingWizard({ doctors, preselectedDoctorSlug }: BookingWizardP
                 <Select
                   id="visitType"
                   value={visitType}
-                  onChange={(e) => setVisitType(e.target.value as any)}
+                  onChange={(e) => setVisitType(e.target.value as "FIRST_VISIT" | "FOLLOW_UP")}
                   className="mt-1.5"
                 >
                   <option value="FIRST_VISIT">First Visit</option>

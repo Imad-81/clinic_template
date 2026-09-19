@@ -11,10 +11,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui
 import { AppointmentStatus } from "@prisma/client";
 import {
   CheckCircle,
-  XCircle,
   Clock,
-  User,
-  AlertCircle,
   Phone,
   FileText,
   UserCheck,

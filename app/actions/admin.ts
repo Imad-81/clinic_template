@@ -6,7 +6,7 @@ import { hashPassword } from "better-auth/crypto";
 import { randomUUID } from "crypto";
 import { generateAppointmentReference } from "@/lib/booking/reference";
 import { normalizeIndianMobile, isValidIndianMobile } from "@/lib/phone";
-import { AppointmentStatus, VisitType } from "@prisma/client";
+import { AppointmentStatus, VisitType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 // -------------------------------------------------------------------
@@ -29,7 +29,7 @@ export async function updateAppointmentStatusAction(params: {
     return { success: false, error: "Appointment not found" };
   }
 
-  const updateData: any = {
+  const updateData: Prisma.AppointmentUpdateInput = {
     status: params.status,
   };
 
@@ -162,8 +162,10 @@ export async function createManualBookingAction(params: {
     revalidatePath("/admin/today");
     revalidatePath("/admin/appointments");
     return { success: true, reference: result.reference };
-  } catch (err: any) {
-    if (err?.message === "SLOT_TAKEN" || err?.code === "P2002" || err?.message?.includes("23505")) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "";
+    const code = typeof err === "object" && err !== null && "code" in err ? (err as { code: unknown }).code : undefined;
+    if (message === "SLOT_TAKEN" || code === "P2002" || message.includes("23505")) {
       return { success: false, error: "That slot was just taken, please pick another." };
     }
     console.error("Manual booking error:", err);

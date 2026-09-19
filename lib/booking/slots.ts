@@ -1,5 +1,5 @@
 import { fromZonedTime, formatInTimeZone, toZonedTime } from "date-fns-tz";
-import { addMinutes, isBefore, isAfter, addDays, startOfDay, isSameDay } from "date-fns";
+import { addMinutes, isBefore, isAfter, addDays, startOfDay } from "date-fns";
 
 export interface DoctorScheduleInput {
   dayOfWeek: number; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday

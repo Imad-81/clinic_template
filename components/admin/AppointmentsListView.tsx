@@ -15,17 +15,8 @@ import { AppointmentStatus } from "@prisma/client";
 import {
   Search,
   Download,
-  Filter,
   PlusCircle,
   Eye,
-  Calendar,
-  Clock,
-  User,
-  Phone,
-  CheckCircle,
-  XCircle,
-  Loader2,
-  FileText,
 } from "lucide-react";
 
 export interface AppointmentRecord {

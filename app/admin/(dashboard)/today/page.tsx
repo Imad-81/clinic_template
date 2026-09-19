@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { clinicConfig } from "@/config/clinic.config";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
-import { format } from "date-fns";
 import { TodayAppointmentsView, TodayAppointment } from "@/components/admin/TodayAppointmentsView";
 
 export const dynamic = "force-dynamic";

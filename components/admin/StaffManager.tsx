@@ -14,14 +14,10 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
-  Users,
   UserPlus,
-  Shield,
   KeyRound,
   Ban,
   CheckCircle,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
 
 export interface StaffUserRecord {
@@ -276,7 +272,7 @@ export function StaffManager({ initialUsers, currentUserId }: StaffManagerProps)
             <Label className="text-xs font-semibold">Role & Permissions</Label>
             <Select
               value={newRole}
-              onChange={(e) => setNewRole(e.target.value as any)}
+              onChange={(e) => setNewRole(e.target.value as "admin" | "receptionist")}
               className="mt-1"
             >
               <option value="receptionist">Receptionist (Appointments & Today Desk only)</option>

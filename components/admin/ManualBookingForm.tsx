@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { getDoctorSlotsAction } from "@/app/actions/booking";
 import { createManualBookingAction } from "@/app/actions/admin";
 import { GroupedSlots, TimeSlot } from "@/lib/booking/slots";
@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 interface ManualBookingFormProps {
@@ -47,8 +46,10 @@ export function ManualBookingForm({ doctors }: ManualBookingFormProps) {
 
   React.useEffect(() => {
     if (!doctorId || !selectedDate) return;
-    setLoadingSlots(true);
-    setSelectedSlot(null);
+    const timer = setTimeout(() => {
+      setLoadingSlots(true);
+      setSelectedSlot(null);
+    }, 0);
 
     getDoctorSlotsAction(doctorId, selectedDate)
       .then((res) => {
@@ -59,6 +60,8 @@ export function ManualBookingForm({ doctors }: ManualBookingFormProps) {
         console.error(err);
         setLoadingSlots(false);
       });
+
+    return () => clearTimeout(timer);
   }, [doctorId, selectedDate]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -243,6 +246,20 @@ export function ManualBookingForm({ doctors }: ManualBookingFormProps) {
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="mEmail" className="text-xs font-semibold">
+              Patient Email (Optional)
+            </Label>
+            <Input
+              id="mEmail"
+              type="email"
+              placeholder="patient@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1.5"
+            />
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <Label htmlFor="mAge" className="text-xs font-semibold">
@@ -281,7 +298,7 @@ export function ManualBookingForm({ doctors }: ManualBookingFormProps) {
               <Select
                 id="mVisit"
                 value={visitType}
-                onChange={(e) => setVisitType(e.target.value as any)}
+                onChange={(e) => setVisitType(e.target.value as "FIRST_VISIT" | "FOLLOW_UP")}
                 className="mt-1.5"
               >
                 <option value="FIRST_VISIT">First Visit</option>
