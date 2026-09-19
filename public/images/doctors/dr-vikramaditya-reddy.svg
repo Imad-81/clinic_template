@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+    <rect width="400" height="400" rx="32" fill="#f8fafc"/>
+    <!-- Background subtle gradient circle -->
+    <circle cx="200" cy="180" r="140" fill="#0891b2" fill-opacity="0.12"/>
+    <!-- Doctor Coat & Silhouette -->
+    <path d="M120 340c0-44.183 35.817-80 80-80s80 35.817 80 80v20H120v-20z" fill="#0891b2" fill-opacity="0.85"/>
+    <path d="M160 260l40 60 40-60v-40h-80v40z" fill="#ffffff"/>
+    <path d="M190 260h20v60h-20z" fill="#0284c7" fill-opacity="0.2"/>
+    <!-- Head -->
+    <circle cx="200" cy="190" r="50" fill="#0891b2" fill-opacity="0.95"/>
+    <!-- Stethoscope Graphic -->
+    <path d="M175 270c-15 15-20 40-10 65m50-65c15 15 20 40 10 65" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="225" cy="335" r="8" fill="#ffffff"/>
+    <!-- Initials Badge -->
+    <rect x="250" y="40" width="110" height="40" rx="20" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+    <text x="305" y="65" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#0891b2" text-anchor="middle">VR</text>
+    <!-- Card footer with Specialty -->
+    <rect x="40" y="320" width="320" height="56" rx="16" fill="#ffffff" fill-opacity="0.95" stroke="#e2e8f0"/>
+    <text x="200" y="344" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Dr. T. Vikramaditya Reddy</text>
+    <text x="200" y="362" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#0891b2" text-anchor="middle">Dermatology</text>
+  </svg>

@@ -1,0 +1,237 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum VisitType {
+  FIRST_VISIT
+  FOLLOW_UP
+}
+
+enum CancelledBy {
+  PATIENT
+  ADMIN
+}
+
+enum UserRole {
+  admin
+  receptionist
+}
+
+// ----------------------------------------------------
+// Application Models
+// ----------------------------------------------------
+
+model Doctor {
+  id              String   @id @default(uuid()) @db.Uuid
+  slug            String   @unique
+  fullName        String   @map("full_name")
+  specialty       String
+  qualifications  String
+  experienceYears Int      @map("experience_years")
+  bio             String   @db.Text
+  languages       String[]
+  consultationFee Int      @map("consultation_fee") // in INR
+  photoPath       String   @map("photo_path")
+  isActive        Boolean  @default(true) @map("is_active")
+  displayOrder    Int      @default(0) @map("display_order")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  schedules    DoctorSchedule[]
+  timeOffs     DoctorTimeOff[]
+  appointments Appointment[]
+
+  @@map("doctors")
+}
+
+model DoctorSchedule {
+  id                  String   @id @default(uuid()) @db.Uuid
+  doctorId            String   @map("doctor_id") @db.Uuid
+  dayOfWeek           Int      @map("day_of_week") // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime           DateTime @map("start_time") @db.Time
+  endTime             DateTime @map("end_time") @db.Time
+  slotDurationMinutes Int?     @map("slot_duration_minutes")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_schedules")
+}
+
+model DoctorTimeOff {
+  id        String   @id @default(uuid()) @db.Uuid
+  doctorId  String   @map("doctor_id") @db.Uuid
+  startsAt  DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt    DateTime @map("ends_at") @db.Timestamptz(3)
+  reason    String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_time_offs")
+}
+
+model ClinicHoliday {
+  id        String   @id @default(uuid()) @db.Uuid
+  date      DateTime @map("date") @db.Date
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@unique([date])
+  @@map("clinic_holidays")
+}
+
+model Patient {
+  id        String   @id @default(uuid()) @db.Uuid
+  fullName  String   @map("full_name")
+  phone     String   // E.164 (+91XXXXXXXXXX)
+  email     String?
+  age       Int
+  gender    String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  appointments Appointment[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id                 String            @id @default(uuid()) @db.Uuid
+  reference          String            @unique // e.g. CLN-7K3Q9X
+  doctorId           String            @map("doctor_id") @db.Uuid
+  patientId          String            @map("patient_id") @db.Uuid
+  startsAt           DateTime          @map("starts_at") @db.Timestamptz(3)
+  endsAt             DateTime          @map("ends_at") @db.Timestamptz(3)
+  status             AppointmentStatus @default(BOOKED)
+  reasonForVisit     String?           @map("reason_for_visit")
+  visitType          VisitType         @default(FIRST_VISIT) @map("visit_type")
+  cancelledAt        DateTime?         @map("cancelled_at") @db.Timestamptz(3)
+  cancelledBy        CancelledBy?      @map("cancelled_by")
+  cancellationReason String?           @map("cancellation_reason")
+  notes              String?           @db.Text
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  // Note: Partial unique index for active slots (status IN ('BOOKED','CONFIRMED'))
+  // is defined in migration SQL: appointments_doctor_slot_active_uniq
+  @@index([doctorId, startsAt])
+  @@index([patientId])
+  @@map("appointments")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+// ----------------------------------------------------
+// Better Auth Models
+// ----------------------------------------------------
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false) @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  role          String?   @default("receptionist")
+  banned        Boolean?  @default(false)
+  banReason     String?   @map("ban_reason")
+  banExpires    DateTime? @map("ban_expires") @db.Timestamptz(3)
+
+  sessions  Session[]
+  accounts  Account[]
+  auditLogs AuditLog[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
+  token          String
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  ipAddress      String?  @map("ip_address")
+  userAgent      String?  @map("user_agent")
+  userId         String   @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?  @map("impersonated_by")
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at") @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model RateLimit {
+  id          String @id
+  key         String
+  count       Int
+  lastRequest BigInt @map("last_request")
+
+  @@unique([key])
+  @@map("rate_limit")
+}

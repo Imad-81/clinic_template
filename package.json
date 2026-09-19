@@ -6,20 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "bun test",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "bun run prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "auth:generate": "better-auth generate"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "better-auth": "^1.7.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
+    "lucide-react": "^1.47.0",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.88.0",
+    "tailwind-merge": "^3.7.0",
+    "ws": "^8.21.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
     "@tailwindcss/postcss": "^4",
+    "@types/bun": "^1.4.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "prisma": "7.10.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
@@ -29,6 +54,8 @@
     "unrs-resolver"
   ],
   "trustedDependencies": [
+    "@prisma/engines",
+    "prisma",
     "sharp",
     "unrs-resolver"
   ]
